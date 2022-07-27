@@ -19,9 +19,10 @@ vrrp_instance VI_1 {
         auth_type PASS
         auth_pass {{ keepalived_auth_pass }}
     }
-    virtual_ipaddress {
-        {{ keepalived_vip }} dev {{ keepalived_shared_iface }} label {{ keepalived_shared_iface }}:0
-    }
+    {% for vip in keepalived_vip %}
+      {{ vip.address }} dev {{ vip.interface }} label {{ vip.interface }}:0
+    {% endfor %}
+
     track_script {
         chk_service
     }
