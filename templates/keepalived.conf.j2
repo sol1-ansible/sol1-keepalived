@@ -13,16 +13,17 @@ vrrp_instance VI_1 {
     priority {{ keepalived_priority }}
     {% else %}
     priority {{ keepalived_backup_priority }}
-    {% endif %}   
+    {% endif %}
     advert_int 1
     authentication {
         auth_type PASS
         auth_pass {{ keepalived_auth_pass }}
     }
+  virtual_ipaddresses {
     {% for vip in keepalived_vip %}
       {{ vip.address }} dev {{ vip.interface }} label {{ vip.interface }}:0
     {% endfor %}
-
+  }
     track_script {
         chk_service
     }
