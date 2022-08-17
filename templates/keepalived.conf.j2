@@ -5,26 +5,53 @@ vrrp_script chk_service {           # Requires keepalived-1.1.13
         script '/etc/keepalived/check_script.sh'     # cheaper than pidof
         interval 2                      # check every 2 seconds
 }
-vrrp_instance VI_1 {
+
+{% for instance in keepalived_instance %}
+
+vrrp_instance {{ instance.name }} {
     state {{ keepalived_role }}
-    interface {{ keepalived_primary_interface }}
-    virtual_router_id {{ keepalived_router_id }}
+    interface {{ instance.primary_interface }}
+    virtual_router_id {{ instance.router_id }}
     {% if keepalived_role.lower() == "master" %}
     priority {{ keepalived_priority }}
     {% else %}
     priority {{ keepalived_backup_priority }}
     {% endif %}
+
+    use_vmac
+
     advert_int 1
     authentication {
         auth_type PASS
-        auth_pass {{ keepalived_auth_pass }}
+        auth_pass {{ instance.auth_pass }}
     }
   virtual_ipaddress {
-    {% for vip in keepalived_vip %}
+    {% for vip in instance.instance_vips %}
       {{ vip.address }} dev {{ vip.interface }} label {{ vip.interface }}:0
     {% endfor %}
   }
+   
+    {% if instance.track_interface is defined %}
+    track_interface {
+     {{ instance.track_interface }}
+    }  
+    {% endif %}
+
     track_script {
         chk_service
     }
+
+
 }
+{% endfor %}
+
+{% if keepalived_sync_group is defined %}
+vrrp_sync_group link_instances {
+   group {
+    {% for instance in keepalived_instance %}
+     {{ instance.name }}
+    {% endfor %}
+  }
+}
+   
+{% endif %}
