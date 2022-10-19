@@ -30,7 +30,17 @@ vrrp_instance {{ instance.name }} {
       {{ vip.address }} dev {{ vip.interface }} label {{ vip.interface }}:0
     {% endfor %}
   }
-   
+
+    {% if instance.notify_master is defined %}
+    notify_master "{{ instance.notify_master }}"
+    {% endif %}
+    {% if instance.notify_backup is defined %}
+    notify_backup "{{ instance.notify_backup }}"
+    {% endif %}
+    {% if instance.notify_fault is defined %}
+    notify_fault "{{ instance.notify_fault }}"
+    {% endif %}
+
     {% if instance.track_interface is defined %}
     track_interface {
      {{ instance.track_interface }}
