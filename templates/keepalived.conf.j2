@@ -9,7 +9,7 @@ vrrp_script chk_service {           # Requires keepalived-1.1.13
 {% for instance in keepalived_instance %}
 
 vrrp_instance {{ instance.name }} {
-    state {{ keepalived_role }}
+    state {{ instance.role }}
     interface {{ instance.primary_interface }}
     virtual_router_id {{ instance.router_id }}
     {% if keepalived_role.lower() == "master" %}
