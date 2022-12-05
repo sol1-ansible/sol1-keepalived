@@ -12,11 +12,7 @@ vrrp_instance {{ instance.name }} {
     state {{ instance.role }}
     interface {{ instance.primary_interface }}
     virtual_router_id {{ instance.router_id }}
-    {% if keepalived_role.lower() == "master" %}
-    priority {{ keepalived_priority }}
-    {% else %}
-    priority {{ keepalived_backup_priority }}
-    {% endif %}
+    priority {{ instance.priority }}
 
     {% if instance.use_vmac is defined %}
     use_vmac
