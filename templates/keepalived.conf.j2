@@ -53,7 +53,7 @@ vrrp_instance {{ instance.name }} {
 }
 {% endfor %}
 
-{% if keepalived_sync_group is defined %}
+{% if keepalived_sync_group is defined and keepalived_sync_group == True %}
 vrrp_sync_group link_instances {
    group {
     {% for instance in keepalived_instance %}
