@@ -1,33 +1,41 @@
- ! Configuration File for keepalived
 global_defs {
 }
-vrrp_script chk_service {           # Requires keepalived-1.1.13
-        script '/etc/keepalived/check_script.sh'     # cheaper than pidof
-        interval 2                      # check every 2 seconds
+
+vrrp_script chk_service {
+        script '/etc/keepalived/check_script.sh'
+        interval 2
 }
 
 {% for instance in keepalived_instance %}
-
 vrrp_instance {{ instance.name }} {
     state {{ instance.role }}
     interface {{ instance.primary_interface }}
     virtual_router_id {{ instance.router_id }}
     priority {{ instance.priority }}
-
     {% if instance.use_vmac is defined %}
     use_vmac
     {% endif %}
-
     advert_int 1
+    {% if instance.unicast_peers is defined %}
+
+    unicast_peer {
+      {% for peer in instance.unicast_peers %}
+      {{ peer }}
+      {% endfor %}
+    }
+
+    {% endif %}
+
     authentication {
         auth_type PASS
         auth_pass {{ instance.auth_pass }}
     }
-  virtual_ipaddress {
-    {% for vip in instance.instance_vips %}
+
+    virtual_ipaddress {
+      {% for vip in instance.instance_vips %}
       {{ vip.address }} dev {{ vip.interface }} label {{ vip.interface }}:0
-    {% endfor %}
-  }
+      {% endfor %}
+    }
 
     {% if instance.notify_master is defined %}
     notify_master "{{ instance.notify_master }}"
@@ -42,14 +50,12 @@ vrrp_instance {{ instance.name }} {
     {% if instance.track_interface is defined %}
     track_interface {
      {{ instance.track_interface }}
-    }  
-    {% endif %}
+    }
 
     track_script {
         chk_service
+    {% endif %}
     }
-
-
 }
 {% endfor %}
 

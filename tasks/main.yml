@@ -1,33 +1,18 @@
 ---
-# This role installs and sets up keepalived
-
-- name: Install keepalived (Centos)
-  yum: name=keepalived state=present
-  when: ansible_os_family == "RedHat"
+- name: Install keepalived
+  ansible.builtin.package:
+    name: keepalived
+    state: present
   tags: keepalived
-  notify: restart keepalived
+  notify: Restart keepalived
 
-- name: Install keepalived (debian/ubuntu)
-  apt: name=keepalived state=latest
-  when: ansible_os_family == "Debian"
+- name: Add keepalived configuration files from templates
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode | default('0644') }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+  loop: "{{ keepalived_templates }}"
   tags: keepalived
-  notify: restart keepalived
-
-- name: chk_service script shell
-  template: 
-    src: check_script.sh.j2 
-    dest: /etc/keepalived/check_script.sh
-    mode: 0755
-    owner: root
-    group: root
-  tags: keepalived
-  notify: restart keepalived
-
-- name: Configure keepalived via template
-  template: src=keepalived.conf.j2 dest=/etc/keepalived/keepalived.conf
-  tags: keepalived
-  notify: restart keepalived
-
-- name: Start keepalived
-  service: name=keepalived state=started
-  tags: keepalived
+  notify: Restart keepalived

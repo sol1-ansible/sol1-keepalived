@@ -1,12 +1,11 @@
 ---
+keepalived_templates:
+  - src: check_script.sh.j2
+    dest: /etc/keepalived/check_script.sh
+    mode: "0755"
+  - src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    mode: "0644"
 
-# Variables for role keepalived
-
-keepalived_auth_pass: "1111"
-keepalived_role: "MASTER"
-keepalived_router_id: "52"
-keepalived_primary_interface: "ens160"
-keepalived_shared_ip: "192.168.1.1"
+# check_script.sh.j2 variables
 keepalived_check_process: "keepalived"
-keepalived_priority: "100"
-keepalived_backup_priority: "50"

@@ -34,6 +34,8 @@ Example playbook with all the variables filled out:
         router_id: "69"
         auth_pass: "fwvips"
         track_interface: "bond0"
+        unicast_peer
+          - 192.168.253.242
         instance_vips:
           - address: "192.168.253.253"
             interface: "bond0"

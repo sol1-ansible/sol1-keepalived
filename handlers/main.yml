@@ -1,7 +1,6 @@
 ---
-
-- name: restart keepalived
-  service: name=keepalived state=restarted
-
-- name: restart network
-  service: name=network state=restart
+- name: Restart keepalived
+  ansible.builtin.service:
+    name: keepalived
+    state: restarted
+    enabled: true
